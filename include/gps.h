@@ -6,9 +6,9 @@ class GPS {
 private:
     TinyGPSPlus gps;
 public:
-    void start();      
-    void work();     
-    void print();
-    double getlat();
-    double getlng();
+    void start(); // инициализация GPS
+    void work(); // обработка данных GPS
+    void print(); // вывод данных GPS в Serial
+    double getlat(); // получение широты
+    double getlng(); // получение долготы
 };

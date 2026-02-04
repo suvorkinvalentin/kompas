@@ -13,7 +13,7 @@ Ble ble;
 Stick stick;
 Prefs prefs;
 unsigned long lastDataSend  = 0;
-const unsigned long dataInterval      = 1000;
+const unsigned long dataInterval      = 1000; //частота обновления экрана
 int prevMode=0;
 double lat2;
 double lng2;
@@ -32,7 +32,6 @@ delay(500);
 display.wakeup();
 Serial.println("DISPLAY ready!");
 delay(500);
-//display.dprint(String(42));
 display.cleanup();
 pinMode(0, INPUT);
 pinMode(9, INPUT_PULLUP);
@@ -58,16 +57,14 @@ if (now - lastDataSend >= dataInterval) {
 
     float yaw=compass.getYaw();
     float yawr=compass.getYawr();
-    double lat1=55.972643; //gps.getlat();
-    double lng1=37.174057; //gps.getlng();
-
-
+    //double lat1=55.972643;
+    //double lng1=37.174057;
+    double lat1=gps.getlat();
+    double lng1=gps.getlng();
     Serial.println(yaw);
     Serial.println(yawr);
-    //display.dprint(String(yaw),5,5);
-    //display.arrow(yawr);
-    //display.update(yawr,String(yaw),140,5);
-    if(nowMode==0){
+    double angle=compass.getAngleTo(lat1,lng1,lat2,lng2);
+    if(nowMode==0){ // режим калибровки
         if (ButtonState==true){
             display.cleanup();
             display.dprint(String("Started"),120,64);
@@ -94,7 +91,7 @@ if (now - lastDataSend >= dataInterval) {
             display.dprint(String("Press button to start receiving"),40,57);
         }
     }
-    double angle=compass.getAngleTo(lat1,lng1,lat2,lng2);
+
     if(nowMode==2){display.update(angle,String("Saved"),140,0, String(angle*RAD_TO_DEG),140,8);} // режим запомненных координат
     if(nowMode==3){display.update(yawr,String("Magnetic North"),98,0, String(yawr*RAD_TO_DEG),140,8);} // режим магнитного севера
     if(nowMode==4){display.update(yawr-compass.magnetDecl,String("True North"),120,0, String((yawr-compass.magnetDecl)*RAD_TO_DEG),140,8);} // режим географического севера

@@ -7,12 +7,10 @@ bool Compass::begin() {
     //Wire.flush();   // Reset I2C
     //sensor.begin(BNO080_DEFAULT_ADDRESS, Wire);
     Wire.begin(4, 5);
-    //sensor.begin(BNO080_DEFAULT_ADDRESS, Wire);
     Wire.setClock(400000);
     if (sensor.begin(BNO080_DEFAULT_ADDRESS, Wire)) {
         Serial.println("BNO080 found and initialized!");
         
-        // 3. Now it is safe to enable features
         sensor.enableRotationVector(50);
         sensor.enableMagnetometer(50);
         delay(1500);
@@ -67,7 +65,6 @@ void Compass::calibrateIMU() {
                 display.dprint(String(sensor.getMagAccuracy()),140,5);
                 m=sensor.getMagAccuracy();
             }
-            //display.dprint(String(sensor.getMagAccuracy()),50,5,1);
             if (sensor.getMagAccuracy()==3){n++;}
             else{n=0;}
         }

@@ -7,20 +7,18 @@ int xVal = analogRead(PIN_X);
 if (xVal > THRESHOLD_HIGH && stickReady) {
         currentMode--;
         
-        // Цикличность: если стало -1, переходим в 3
         if (currentMode < 0) {
             currentMode = Modes - 1;
         }
         Serial.print("Mode changed to: ");
         Serial.println(currentMode);
 
-        stickReady = false; // Блокируем, пока стик не вернется в центр
+        stickReady = false; 
     }
-    // 2. Если стик отклонен ВЛЕВО и он был "готов"
 else if (xVal < THRESHOLD_LOW && stickReady) {
         currentMode++;
         
-       // Цикличность: если стало 4, сбрасываем в 0
+
         if (currentMode >= Modes) {
             currentMode = 0;
         }
@@ -28,9 +26,8 @@ else if (xVal < THRESHOLD_LOW && stickReady) {
         Serial.print("Mode changed to: ");
         Serial.println(currentMode);
 
-        stickReady = false; // Блокируем
+        stickReady = false; 
     }
-    // 3. Если стик В ЦЕНТРЕ (мертвая зона), разрешаем новое переключение
 else if (xVal > CENTER_MIN && xVal < CENTER_MAX) {
         stickReady = true;
     }

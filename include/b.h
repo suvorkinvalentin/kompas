@@ -15,6 +15,6 @@ class Stick{
     const int CENTER_MAX = 3400;
 
 public:
-int check();
-bool Bcheck();
+int check(); // проверка положения стика и переключение режимов
+bool Bcheck(); // проверка состояния кнопки
 };

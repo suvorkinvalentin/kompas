@@ -1,7 +1,7 @@
 #include "display.h"
 Display display;
 Display::Display() 
-  : display(GxEPD2_290_BS(10, 6, 7, 8)) // ⚡ тут конструктор
+  : display(GxEPD2_290_BS(10, 6, 7, 8)) 
 {
 }
 void Display::wakeup(){
