@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>BLE Compass Map</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  body {
+    margin: 0;
+    background: #111;
+    color: #eee;
+    font-family: sans-serif;
+  }
+  #map {
+    height: 70vh;
+  }
+  .panel {
+    padding: 10px;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    margin-top: 5px;
+    background: #2a7;
+    border: none;
+    font-weight: bold;
+  }
+  #status {
+    margin-top: 5px;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="map"></div>
+
+<div class="panel">
+  <button id="connectBtn">Подключиться к ESP32</button>
+  <button id="sendBtn">Отправить точку</button>
+  <div id="status">Статус: не подключено</div>
+</div>
+
+<script>
+/* ===== BLE ===== */
+const SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+const CHARACTERISTIC_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+
+let characteristic = null;
+let selectedLat = null;
+let selectedLon = null;
+
+const statusEl = document.getElementById("status");
+
+/* ===== Карта ===== */
+const map = L.map('map').setView([55.751244, 37.618423], 10);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+let marker = null;
+
+map.on('click', e => {
+  selectedLat = e.latlng.lat;
+  selectedLon = e.latlng.lng;
+
+  if (marker) marker.remove();
+  marker = L.marker([selectedLat, selectedLon]).addTo(map);
+
+  statusEl.textContent =
+    `Выбрана точка: ${selectedLat.toFixed(6)}, ${selectedLon.toFixed(6)}`;
+});
+
+/* ===== BLE connect ===== */
+document.getElementById("connectBtn").onclick = async () => {
+  try {
+    statusEl.textContent = "Поиск ESP32...";
+
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: [SERVICE_UUID]
+    });
+
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+    statusEl.textContent = "BLE подключено ✔";
+  } catch (e) {
+    console.error(e);
+    statusEl.textContent = "Ошибка BLE";
+  }
+};
+
+/* ===== Send coords ===== */
+document.getElementById("sendBtn").onclick = async () => {
+  if (!characteristic) {
+    statusEl.textContent = "Нет BLE соединения";
+    return;
+  }
+  if (selectedLat === null) {
+    statusEl.textContent = "Сначала ткни по карте";
+    return;
+  }
+
+  const msg = `${selectedLat},${selectedLon}\n`;
+
+  try {
+    await characteristic.writeValue(
+      new TextEncoder().encode(msg)
+    );
+    statusEl.textContent = "Отправлено ✔";
+  } catch (e) {
+    console.error(e);
+    statusEl.textContent = "Ошибка отправки";
+  }
+};
+</script>
+
+</body>
+</html>
