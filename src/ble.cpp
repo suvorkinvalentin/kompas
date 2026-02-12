@@ -108,10 +108,10 @@ void Ble::waitForTargetCoords() {
     pServer->disconnect(0); 
 }
 
-float Ble::getTargetLat() {
+double Ble::getTargetLat() {
     return targetLat;
 }
 
-float Ble::getTargetLon() {
+double Ble::getTargetLon() {
     return targetLon;
 }
