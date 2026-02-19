@@ -34,7 +34,7 @@ Serial.println("DISPLAY ready!");
 delay(500);
 display.cleanup();
 pinMode(0, INPUT);
-pinMode(9, INPUT_PULLUP);
+pinMode(13, INPUT_PULLUP);
 
 prefs.load(lat2,lng2);
 }
