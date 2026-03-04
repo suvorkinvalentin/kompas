@@ -5,7 +5,7 @@ class Stick{
     private:
     const int PIN_X = 0;
     const int PIN_B = 13;
-    const int Modes = 5; // количество режимов
+    const int Modes = 7; // количество режимов
     int currentMode = 0;
     bool stickReady = true;
 

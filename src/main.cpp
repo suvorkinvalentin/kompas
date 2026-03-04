@@ -17,6 +17,9 @@ const unsigned long dataInterval      = 1000; //частота обновлен�
 int prevMode=0;
 double lat2;
 double lng2;
+double lat0;
+double lng0;
+double angle0;
 
 void setup(){
 unsigned long start_time = millis();
@@ -88,12 +91,28 @@ if (now - lastDataSend >= dataInterval) {
 
         }
         else{
-            display.dprint(String("Press button to start receiving"),40,57);
+            display.dprint(String("Press button to start receiving target coordinates"),30,57);
+        }
+    }
+    if(nowMode==2){
+        if (ButtonState==true){
+        display.cleanup();
+        display.dprint(String("Started"),120,57);
+        ble.waitForTargetCoords();
+        lat0=ble.getTargetLat();
+        lng0=ble.getTargetLon();
+
+        }
+        else{
+            display.dprint(String("Press button to start receiving start coordinates"),30,57);
         }
     }
 
-    if(nowMode==2){display.update(angle,String("Saved"),140,0, String(angle*RAD_TO_DEG),140,8);} // режим запомненных координат
-    if(nowMode==3){display.update(yawr,String("Magnetic North"),98,0, String(yawr*RAD_TO_DEG),140,8);} // режим магнитного севера
-    if(nowMode==4){display.update(yawr-compass.magnetDecl,String("True North"),120,0, String((yawr-compass.magnetDecl)*RAD_TO_DEG),140,8);} // режим географического севера
+    if(nowMode==3){display.update(angle,String("Saved gps"),140,0, String(angle*RAD_TO_DEG),140,8);} // режим запомненных координат
+    if(nowMode==4){display.update(yawr,String("Magnetic North"),110,0, String(yawr*RAD_TO_DEG),140,8);} // режим магнитного севера
+    if(nowMode==5){display.update(yawr-compass.magnetDecl,String("True North"),120,0, String((yawr-compass.magnetDecl)*RAD_TO_DEG),140,8);} // режим географического севера
+    if(nowMode==6){
+        angle0=compass.getAngleTo(lat0,lng0,lat2,lng2);
+        display.update(angle0,String("Saved no gps"),110,0, String(angle0*RAD_TO_DEG),140,8);} // режим запомненных координат относительно начальной точки
 }
 }
