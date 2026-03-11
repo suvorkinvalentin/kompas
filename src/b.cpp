@@ -1,5 +1,5 @@
 #include "b.h"
-
+Stick stick;
 
 
 int Stick::check(){

@@ -1,6 +1,5 @@
 #include "imu.h"
 #include "display.h"
-#include "gps.h"
 bool Compass::begin() {
      delay(100); //  Wait for BNO to boot
  // Start i2c and BNO080

@@ -1,4 +1,5 @@
 #include "ble.h"
+#include "b.h"
 
 /* ===== Callbacks Classes ===== */
 
@@ -91,7 +92,13 @@ void Ble::waitForTargetCoords() {
 
     while (!clientConnected) {
         delay(50);
-
+        if (stick.Bcheck()==true){
+            delay(500);
+            adv->stop(); 
+            pServer->disconnect(0);
+            Serial.println("BLE disconnected by user");
+            return;
+        }
     }
 
     Serial.println("Waiting for coordinates...");

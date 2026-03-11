@@ -2,7 +2,7 @@
 HardwareSerial GPSSerial(1);
 void GPS::start(){
     Serial.println("GPS started");
-    GPSSerial.begin(9600, SERIAL_8N1, 12, 1);
+    GPSSerial.begin(9600, SERIAL_8N1, 1, 12);
 }
 void GPS::work(){
     while (GPSSerial.available()) {

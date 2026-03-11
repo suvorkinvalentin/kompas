@@ -10,7 +10,6 @@
 Compass compass;
 GPS gps;
 Ble ble;
-Stick stick;
 Prefs prefs;
 unsigned long lastDataSend  = 0;
 const unsigned long dataInterval      = 1000; //частота обновления экрана
