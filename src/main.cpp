@@ -19,6 +19,9 @@ double lng2;
 double lat0;
 double lng0;
 double angle0;
+bool DisplayFlag=true;
+double prevAngle=0;
+double angle;
 
 void setup(){
 unsigned long start_time = millis();
@@ -50,12 +53,13 @@ int nowMode=stick.check();
 bool ButtonState=stick.Bcheck(); // 0 = не нажата, 1 = нажата
 if (!(prevMode==nowMode)){
     prevMode=nowMode;
+    DisplayFlag=true;
     display.cleanup();
 }
 if (now - lastDataSend >= dataInterval) {
     lastDataSend = now;
 
-    gps.print();
+    //gps.print();
 
     float yaw=compass.getYaw();
     float yawr=compass.getYawr();
@@ -63,55 +67,98 @@ if (now - lastDataSend >= dataInterval) {
     //double lng1=37.174057;
     double lat1=gps.getlat();
     double lng1=gps.getlng();
-    Serial.println(yaw);
-    Serial.println(yawr);
-    double angle=compass.getAngleTo(lat1,lng1,lat2,lng2);
-    if(nowMode==0){ // режим калибровки
+    switch(nowMode){
+    case 0: // режим калибровки
         if (ButtonState==true){
             display.cleanup();
-            display.dprint(String("Started"),120,64);
+            display.dprint(("Started"),120,64);
             compass.calibrateIMU();
             display.cleanup();
+            DisplayFlag=true;
         }
         else{
+            if (DisplayFlag){
+                DisplayFlag=false;
+                display.dprint(String(compass.getCal()),145,10);
+                display.dprint(("Press button to start calibrating"),50,57);
+        }}
+        break;
 
-            display.dprint(String(compass.getCal()),100,10);
-            display.dprint(String("Press button to start calibrating"),40,57);
-        }
-    }
-    if(nowMode==1){
+    case 1: // режим получения координат цели
         if (ButtonState==true){
         display.cleanup();
-        display.dprint(String("Started"),120,57);
+        display.dprint(("Started"),120,57);
         ble.waitForTargetCoords();
         lat2=ble.getTargetLat();
         lng2=ble.getTargetLon();
         prefs.save(lat2,lng2);
-
+        DisplayFlag=true;
         }
         else{
-            display.dprint(String("Press button to start receiving target coordinates"),30,57);
-        }
-    }
-    if(nowMode==2){
+            if (DisplayFlag){
+                DisplayFlag=false;
+                display.dprint(("Press button to start receiving target coordinates"),0,57);
+        }}
+        break;
+    
+    case 2: // режим получения начальных координат
         if (ButtonState==true){
         display.cleanup();
-        display.dprint(String("Started"),120,57);
+        display.dprint(("Started"),120,57);
         ble.waitForTargetCoords();
         lat0=ble.getTargetLat();
         lng0=ble.getTargetLon();
-
+        DisplayFlag=true;
         }
         else{
-            display.dprint(String("Press button to start receiving start coordinates"),30,57);
+            if (DisplayFlag){
+                DisplayFlag=false;
+                display.dprint(("Press button to start receiving start coordinates"),0,57);
+        }}
+        break;
+    
+    case 3: // режим сохранения текущих координат
+        if (ButtonState==true){
+        display.cleanup();
+        display.dprint(("Saved"),120,57);
+        lat2=ble.getTargetLat();
+        lng2=ble.getTargetLon();
+        prefs.save(lat2,lng2);
         }
-    }
-
-    if(nowMode==3){display.update(angle,String("Saved gps"),140,0, String(angle*RAD_TO_DEG),140,8);} // режим запомненных координат
-    if(nowMode==4){display.update(yawr,String("Magnetic North"),110,0, String(yawr*RAD_TO_DEG),140,8);} // режим магнитного севера
-    if(nowMode==5){display.update(yawr-compass.magnetDecl,String("True North"),120,0, String((yawr-compass.magnetDecl)*RAD_TO_DEG),140,8);} // режим географического севера
-    if(nowMode==6){
-        angle0=compass.getAngleTo(lat0,lng0,lat2,lng2);
-        display.update(angle0,String("Saved no gps"),110,0, String(angle0*RAD_TO_DEG),140,8);} // режим запомненных координат относительно начальной точки
+        else{
+            if (DisplayFlag){
+                DisplayFlag=false;
+                display.dprint(("Press button to save current coordinates"),30,57); 
+        }}
+        break;
+    
+    case 4: // режим отображения информации
+        int nowBMode=stick.BModecheck();
+        //Serial.print("BMode: ");Serial.println(nowBMode);
+        switch(nowBMode){
+        case 0:
+            angle=compass.getAngleTo(lat1,lng1,lat2,lng2);
+            if (abs(angle-prevAngle)>0.02){
+                    prevAngle=angle;
+                    display.update(angle,("Saved gps"),140,0, String(angle*RAD_TO_DEG),140,8);} // режим запомненных координат
+            break;
+        case 3:
+            if (abs(yawr-prevAngle)>0.02){
+                prevAngle=yawr;
+                display.update(yawr,("Magnetic North"),110,0, String(yawr*RAD_TO_DEG),140,8);} // режим магнитного севера
+            break;
+        case 2:
+            if (abs(yawr-compass.magnetDecl-prevAngle)>0.02){
+                prevAngle=yawr-compass.magnetDecl;
+                display.update(yawr-compass.magnetDecl,("True North"),120,0, String((yawr-compass.magnetDecl)*RAD_TO_DEG),140,8);} // режим географического севера
+            break;
+        case 1:
+            angle0=compass.getAngleTo(lat0,lng0,lat2,lng2);
+            if (abs(angle0-prevAngle)>0.02){
+                prevAngle=angle0;
+                display.update(angle0,("Saved no gps"),110,0, String(angle0*RAD_TO_DEG),140,8);}} // режим запомненных координат относительно начальной точки
+            break;
+        break;
+}
 }
 }

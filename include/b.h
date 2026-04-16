@@ -5,10 +5,12 @@ class Stick{
     private:
     const int PIN_X = 0;
     const int PIN_B = 13;
-    const int Modes = 7; // количество режимов
+    const int Modes = 5; // количество режимов
+    const int BModes = 4; // количество режимов
     int currentMode = 0;
+    int currentBMode = 0;
     bool stickReady = true;
-
+    bool BReady = true;
     const int THRESHOLD_LOW = 1000;
     const int THRESHOLD_HIGH = 3900;
     const int CENTER_MIN = 1500;
@@ -17,5 +19,6 @@ class Stick{
 public:
 int check(); // проверка положения стика и переключение режимов
 bool Bcheck(); // проверка состояния кнопки
+int BModecheck(); // проверка состояния кнопки для переключения режимов
 };
 extern Stick stick;

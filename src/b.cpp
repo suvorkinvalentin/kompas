@@ -38,3 +38,18 @@ bool Stick::Bcheck(){
     bool b=!(digitalRead(PIN_B));
     return b;
 }
+int Stick::BModecheck(){
+bool b=!(digitalRead(PIN_B));
+if (b && BReady) {
+        currentBMode++;
+        
+        if (currentBMode >= BModes) {
+            currentBMode = 0;
+        }
+        BReady = false; 
+    }
+else if (!b) {
+        BReady = true;
+    }
+return currentBMode;
+}
