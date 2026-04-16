@@ -6,8 +6,6 @@ void Prefs::save(double lat, double lon) {
     prefs.putDouble("target_lon", lon);
     
     prefs.end();
-    
-    Serial.println("Coordinates Saved!");
 }
 void Prefs::load(double &lat, double &lon){
     prefs.begin("nav_data", true);
@@ -16,7 +14,4 @@ void Prefs::load(double &lat, double &lon){
     lon = prefs.getDouble("target_lon", 0.0);
 
     prefs.end();
-    
-    Serial.print("Loaded Lat: "); Serial.println(lat, 6);
-    Serial.print("Loaded Lon: "); Serial.println(lon, 6);
 }
